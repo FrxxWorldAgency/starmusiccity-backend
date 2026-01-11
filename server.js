@@ -1,40 +1,38 @@
 import express from "express"
 import cors from "cors"
-import { betterAuth } from "better-auth"
-import { createClient } from "@supabase/supabase-js"
 
-// Express setup
 const app = express()
 app.use(cors())
 app.use(express.json())
 
-// Supabase client (service role key required)
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-)
-
-// Better Auth setup
-const auth = betterAuth({
-  baseURL: process.env.BETTER_AUTH_URL,        // e.g., "https://your-app.onrender.com"
-  secret: process.env.BETTER_AUTH_SECRET,      // random long secret
-  database: {
-    provider: "supabase",
-    client: supabase
-  },
-  emailAndPassword: { enabled: true }
-})
-
-// Auth routes
-app.use("/api/auth", auth.handler)
-
-// Test endpoint
+// Root endpoint — public
 app.get("/", (req, res) => {
   res.send("Star Music City Backend Running")
 })
 
-// Render requires PORT from environment
+// Example protected route
+// Natively injects authentication middleware on /api/auth
+// Here we just simulate a route that requires auth
+app.get("/api/protected", (req, res) => {
+  // Natively injects session info in req.session or headers
+  // You can access the user info like this if Natively provides it:
+  // const user = req.headers["x-natively-user"]
+  // For demonstration, just return a sample response
+  res.json({
+    message: "This is a protected route",
+    note: "Use Natively's /api/auth to handle login/signup"
+  })
+})
+
+// Add your own API routes here
+// Example:
+// app.post("/api/songs", (req, res) => { ... })
+
+// Use Render's port
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
+
+
+
 
 
